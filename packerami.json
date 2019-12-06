@@ -1,0 +1,63 @@
+{
+   "variables": {
+      "aws_access_key": "AKIAYZ7GZBCKKLJ5TQ42",
+      "aws_secret_key": "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"
+   },
+   "builders": [
+      {
+         "access_key": "{{user `aws_access_key`}}",
+         "secret_key": "{{user `aws_secret_key`}}",
+
+         "ami_description": "CentOS7 s HTTPD",
+         "ami_name": "centos-with-httpd",
+         "force_delete_snapshot": true,
+         "force_deregister": true,
+         "instance_type": "t2.micro",
+         "region": "us-east-1",
+         "run_tags": {
+            "Name": "CentOS7 s HTTPD {{ isotime }}",
+            "packer": "1"
+         },
+         "run_volume_tags": {
+            "Name": "CentOS7 s HTTPD {{ isotime }}",
+            "packer": "1"
+         },
+         "source_ami_filter": {
+            "filters": {
+               "architecture": "x86_64",
+               "name": "CentOS Linux 7 x86_64 HVM EBS *",
+               "root-device-type": "ebs",
+               "virtualization-type": "hvm"
+            },
+            "most_recent": true,
+            "owners": [
+               "679593333241"
+            ]
+         },
+         "ssh_username": "centos",
+         "tags": {
+            "Name": "CentOS7HTTPD",
+            "purpose": "packer-test-webserver"
+         },
+         "type": "amazon-ebs"
+      }
+   ],
+   "provisioners": [
+      {
+         "ansible_env_vars": [
+            "CACHE_PLUGIN_TIMEOUT=10"
+         ],
+         "extra_arguments": [
+            "--become",
+            "--extra-vars",
+            "ssh_key_user=centos"
+         ],
+         "groups": [
+            "centos"
+         ],
+         "playbook_file": "ansible/setup-httpd.yml",
+         "type": "ansible",
+         "user": "centos"
+      }
+   ]
+}
